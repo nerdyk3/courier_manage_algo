@@ -35,13 +35,33 @@ def add_carrier():
         "varicle_monthly_cycle_end":varicle_monthly_cycle_end,
         "varicle_minimum_gurantee":varicle_minimum_gurantee
     }
-    with open('./data.json', 'a') as outfile:
-        json.dump(context, outfile)
+    with open('./data.json', 'a') as writefile:
+        json.dump(context, writefile)
     return context
 
 @app.route('/calculation',methods=['POST','GET'])
 def rate_calculation():
-    return "pass"
+    varicle_number = input("Input varicle_number:")
+    varicle_monthly_cycle_start = input("Input monthly_cycle_start(DD/MM):")
+    varicle_monthly_cycle_end = input("Input varicle_monthly_cycle_end(DD/MM):")
+    varicle_total_km = input("Input varicle_total_km /km:")
+    context={}
+    data = {}
+    with open('./data.json') as readfile:
+        data = json.load(readfile)
+    if varicle_number in data:
+        if varicle_monthly_cycle_end > data["varicle_monthly_cycle_end"]:
+            if  varicle_total_km > data["varicle_minimum_gurantee"]:
+                diff_km = varicle_total_km - data["varicle_minimum_gurantee"]
+                minimum_gurantee_price = data["varicle_minimum_gurantee"]*data["varicle_rate"]
+                total_price = minimum_gurantee_price + diff_km*(data["varicle_rate"]+20%data["varicle_rate"])
+                context.update({"total_price":total_price})
+        else:
+            diff_km =  data["varicle_minimum_gurantee"]-varicle_total_km
+            minimum_gurantee_price = data["varicle_minimum_gurantee"]*data["varicle_rate"]
+            total_price = minimum_gurantee_price + diff_km*data["varicle_rate"]
+            context.update({"total_price":total_price})
+    return context
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8000))
