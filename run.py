@@ -28,6 +28,8 @@ def add_carrier():
     }
     return context
 
+def rate_calculation():
+    return "pass"
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8000))
